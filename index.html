@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatGPT Chatbot</title>
+    <style>
+        body { font-family: Arial, sans-serif; text-align: center; }
+        #chat { width: 90%; max-width: 500px; margin: auto; }
+        #messages { border: 1px solid #ccc; padding: 10px; height: 300px; overflow-y: auto; }
+        input, button { width: 100%; padding: 10px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <h1>ChatGPT Chatbot</h1>
+    <div id="chat">
+        <div id="messages"></div>
+        <input type="text" id="userInput" placeholder="Savolingizni yozing...">
+        <button onclick="sendMessage()">Yuborish</button>
+    </div>
+
+    <script>
+        const apiKey = "org-FZpp8kIhji9LQ5kqMD1JayLN"; // Bu yerga OpenAI API tokeningizni qo'ying
+        const messagesDiv = document.getElementById("messages");
+
+        function sendMessage() {
+            let userInput = document.getElementById("userInput").value;
+            if (!userInput) return;
+
+            // Foydalanuvchi xabarini chiqarish
+            messagesDiv.innerHTML += "<p><strong>Siz:</strong> " + userInput + "</p>";
+            document.getElementById("userInput").value = "";
+
+            // OpenAI API orqali javob olish
+            fetch("https://api.openai.com/v1/chat/completions", {
+                method: "POST",
+                headers: {
+                    "Authorization": "Bearer " + apiKey,
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({
+                    model: "gpt-3.5-turbo",
+                    messages: [{ role: "user", content: userInput }]
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                let reply = data.choices[0].message.content;
+                messagesDiv.innerHTML += "<p><strong>Bot:</strong> " + reply + "</p>";
+                messagesDiv.scrollTop = messagesDiv.scrollHeight;
+            })
+            .catch(error => {
+                messagesDiv.innerHTML += "<p><strong>Xatolik:</strong> Bot ishlamayapti!</p>";
+            });
+        }
+    </script>
+</body>
+</html>
